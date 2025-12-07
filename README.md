@@ -1,5 +1,7 @@
 # Tech Stack Treemap (Oracle JET 19)
 
+![Tech Stack Treemap](./tech-stack-tree-map_image.png)
+
 An Oracle JET 19 web app that renders a treemap of technologies and their impact using data from a CSV file. The app follows the JET Cookbook’s Treemap Node Content approach.
 
 Demo target (local dev server):
