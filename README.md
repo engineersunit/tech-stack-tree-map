@@ -156,3 +156,28 @@ Alternatively, you can edit the source CSV in the project root (`tech_2025.csv`)
 - Implemented CSV parsing and data provider in `src/js/root.js`
 - Included `src/data/tech_2025.csv` and wired to RequireJS text loader
 - Verified with `npx ojet serve` (live reloading on file changes)
+
+## Cline Memory Bank
+
+This repo includes a Cline Memory Bank to preserve context across sessions.
+
+Location:
+- memory-bank/
+  - projectbrief.md
+  - productContext.md
+  - activeContext.md
+  - systemPatterns.md
+  - techContext.md
+  - progress.md
+- .clinerules (project-scoped Memory Bank custom instructions)
+
+How to use with Cline:
+- At the start of a session/task, type: “follow your custom instructions”
+- To re-sync documentation as work progresses, type: “update memory bank”
+- Cline will read/write the files above to keep context accurate
+
+Notes:
+- The treemap currently uses a nodeTemplate with `<oj-treemap-node>` (see src/index.html)
+- Known technical items are tracked in memory-bank/progress.md (e.g., DataProvider keyAttributes, color indexing)
+- Keep the Memory Bank files updated after significant changes; they are the source of truth for continuity
+</content>

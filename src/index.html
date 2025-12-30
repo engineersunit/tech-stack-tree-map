@@ -23,44 +23,41 @@
   section to represent the appropriate content type.
   ***************************** IMPORTANT INFORMATION ************************************ -->
 <html lang="en-us">
-  <head>
-    <title>Tech Stack Treemap</title>
-    <meta http-equiv="x-ua-compatible" content="IE=edge"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="viewport" content="viewport-fit=cover, initial-scale=1.0"/>
-    <link rel="icon" type="image/x-icon" href="css/images/JET-Favicon-Red-32x32.png">
-    <link rel="apple-touch-icon-precomposed" href="css/images/touchicon.png">
-    <meta name="apple-mobile-web-app-title" content="Oracle JET">
 
-		<!-- injector:theme -->
-		<!-- endinjector -->
+<head>
+  <title>Tech Stack Treemap</title>
+  <meta http-equiv="x-ua-compatible" content="IE=edge" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="viewport-fit=cover, initial-scale=1.0" />
+  <link rel="icon" type="image/x-icon" href="css/images/JET-Favicon-Red-32x32.png">
+  <link rel="apple-touch-icon-precomposed" href="css/images/touchicon.png">
+  <meta name="apple-mobile-web-app-title" content="Oracle JET">
 
-  </head>
-  <body>
-    <div id="app" class="oj-web-applayout-page">
-      <div class="oj-web-applayout-max-width oj-web-applayout-content oj-sm-padding-4x">
-        <h1 class="oj-typography-heading-xl oj-sm-margin-4x-bottom">Tech Stack Impact Treemap</h1>
-        <oj-treemap id="techTreemap"
-                    data="[[dataProvider]]"
-                    style="width:100%; height:80vh"
-                    animation-on-display="auto"
-                    animation-on-data-change="auto">
+  <!-- injector:theme -->
+  <!-- endinjector -->
 
-          <template slot="nodeTemplate" data-oj-as="node">
+</head>
 
-            <oj-treemap-node
-                  label="[[node.data.label]]"
-                  value="[[node.data.value]]"
-                  color="[[node.data.color]]"
-                  short-desc="[[node.data.shortDesc]]"></oj-treemap-node>
-              </template>
-          </template>
-        </oj-treemap>
-      </div>
+<body>
+  <div id="app" class="oj-web-applayout-page">
+    <div class="oj-web-applayout-max-width oj-web-applayout-content oj-sm-padding-4x">
+      <h1 class="oj-typography-heading-xl oj-sm-margin-4x-bottom">Tech Stack Impact Treemap</h1>
+      <oj-treemap id="techTreemap" data="[[dataProvider]]" style="width:100%; height:80vh" animation-on-display="auto"
+        animation-on-data-change="auto">
+
+        <template slot="nodeTemplate" data-oj-as="node">
+
+          <oj-treemap-node label="[[node.data.label]]" value="[[node.data.value]]" color="[[node.data.color]]"
+            short-desc="[[node.data.shortDesc]]"
+            label-style='{"fontSize":"25px","fontWeight":"900","whiteSpace":"wrap"}'></oj-treemap-node>
+        </template>
+      </oj-treemap>
     </div>
+  </div>
 
-    <!-- This injects script tags for the main javascript files -->
-		<!-- injector:scripts -->
-		<!-- endinjector -->
-  </body>
+  <!-- This injects script tags for the main javascript files -->
+  <!-- injector:scripts -->
+  <!-- endinjector -->
+</body>
+
 </html>
