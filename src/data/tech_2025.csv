@@ -1,15 +1,15 @@
-﻿technology,impact,id
-APEX,10,1
-Visual Builder,30,2
-Helidon Microservices,40,3
-Oracle Cloud Infra,30,4
-Java,40,5
-JavaScript,30,6
-HTML,20,7
-Oracle ADB,10,8
-Oracle JET,20,9
-Figma,5,10
-MCP,5,11
-Oracle AI Agent Studio,5,12
-Terraform,5,13
-Oracle Linux,5,14
+﻿Area,technology,impact,id
+Applications/Low-code,APEX,10,1
+Applications/Low-code,Visual Builder,30,2
+Backend/Services,Helidon Microservices,40,3
+Cloud/Infra,Oracle Cloud Infra,30,4
+Backend/Services,Java,40,5
+Frontend/UI,JavaScript,30,6
+Frontend/UI,HTML,20,7
+Database/Data,Oracle ADB,10,8
+Frontend/UI,Oracle JET,20,9
+Design/UX,Figma,5,10
+AI/Agents,MCP,5,11
+AI/Agents,Oracle AI Agent Studio,5,12
+Cloud/Infra,Terraform,5,13
+Cloud/Infra,Oracle Linux,5,14

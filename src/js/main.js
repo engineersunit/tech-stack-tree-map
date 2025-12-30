@@ -18,6 +18,39 @@
     // on the busy state context.
     window["oj_whenReady"] = true;
 
+    // Debugging utility: global window.debug with flag control via ?debug=1 or localStorage 'debug'
+    (function initDebug() {
+      try {
+        var params = new URLSearchParams(location.search);
+        var q = params.get('debug');
+        var ls = localStorage.getItem('debug');
+        var enabled = (q != null ? (q === '1' || q === 'true') : (ls === '1' || ls === 'true'));
+        var api = {
+          enabled: !!enabled,
+          set: function (on) {
+            this.enabled = !!on;
+            try { localStorage.setItem('debug', this.enabled ? '1' : '0'); } catch (e) {}
+            return this.enabled;
+          },
+          enable: function () { return this.set(true); },
+          disable: function () { return this.set(false); },
+          log: function () { if (this.enabled && console && console.log) console.log.apply(console, arguments); },
+          warn: function () { if (this.enabled && console && console.warn) console.warn.apply(console, arguments); },
+          group: function () { if (this.enabled && console && console.group) console.group.apply(console, arguments); },
+          groupEnd: function () { if (this.enabled && console && console.groupEnd) console.groupEnd.apply(console, arguments); },
+          time: function (label) { if (this.enabled && console && console.time) console.time(label); },
+          timeEnd: function (label) { if (this.enabled && console && console.timeEnd) console.timeEnd(label); }
+        };
+        window.debug = window.debug || api;
+        // Initialize with computed enabled state
+        window.debug.set(api.enabled);
+      } catch (e) {
+        // Fallback: define a no-op debug object
+        window.debug = window.debug || { enabled: false, log: function(){}, warn: function(){}, group: function(){}, groupEnd: function(){}, time: function(){}, timeEnd: function(){}, enable: function(){}, disable: function(){}, set: function(){} };
+      }
+    }());
+    if (window.debug && window.debug.enabled) { window.debug.log('[main] Bootstrapping RequireJS & JET...'); }
+
     requirejs.config(
     {
       baseUrl: 'js',
@@ -61,4 +94,7 @@
 /**
  * Load the application's entry point file
  */
-require(['./root']);
+if (window.debug && window.debug.enabled) { window.debug.log('[main] Loading entry module: ./root'); }
+require(['./root'], function () {
+  if (window.debug && window.debug.enabled) { window.debug.log('[main] Entry module loaded'); }
+});

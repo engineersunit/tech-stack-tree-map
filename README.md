@@ -2,7 +2,7 @@
 
 ![Tech Stack Treemap](./docs/images/tech-stack-tree-map.png)
 
-An Oracle JET 19 web app that renders a treemap of technologies and their impact using data from a CSV file. The app follows the JET Cookbook’s Treemap Node Content approach.
+An Oracle JET 19 web app that renders a hierarchical treemap of technologies and their impact using data from a CSV file. The app uses the JET Cookbook’s Treemap Node Content approach to render icons on leaf nodes.
 
 Demo target (local dev server):
 - http://localhost:8000
@@ -21,14 +21,18 @@ Demo target (local dev server):
 ```
 .
 ├─ src/
-│  ├─ index.html                 # Contains <oj-treemap> with nodeContentTemplate
+│  ├─ index.html                 # <oj-treemap> with nodeTemplate and nodeContentTemplate (icons)
 │  ├─ js/
 │  │  ├─ main.js                 # RequireJS config injects JET paths
-│  │  ├─ root.js                 # KO ViewModel: loads & parses CSV, provides DataProvider
+│  │  ├─ root.js                 # KO ViewModel: loads & parses CSV to hierarchical nodes
 │  │  └─ path_mapping.json       # Library/CDN mappings used by JET tooling
 │  ├─ data/
 │  │  └─ tech_2025.csv           # CSV data used by the treemap (served)
-│  └─ css/                       # Theme and assets
+│  └─ css/
+│     └─ images/
+│        └─ tech/                # Icon assets used in leaf nodes
+├─ docs/
+│  └─ images/                    # Repo/documentation assets (source icon files also stored here)
 ├─ oraclejetconfig.json          # JET 19 app configuration
 ├─ package.json
 └─ README.md
@@ -38,53 +42,76 @@ Demo target (local dev server):
 
 CSV file: `src/data/tech_2025.csv`
 
-Columns:
-- `technology` (string) – used as node label and id
-- `impact` (number) – used as node value (size)
-- `icon` (optional) – currently not used in this implementation
-- `badge` (optional) – currently not used in this implementation
+Columns (in order):
+- `Area` (string) – parent group (e.g., Frontend/UI, Backend/Services)
+- `technology` (string) – leaf node label and id suffix
+- `impact` (number) – leaf node value (size)
+- `id` (number/string) – not used as the DataProvider key; kept for reference
 
 Example:
 
 ```
-technology,impact,icon,badge
-APEX,10,,
-Visual Builder,30,,
-Helidon Microservices,40,,
-Oracle Cloud Infra,30,,
-Java,40,,
+Area,technology,impact,id
+Frontend/UI,Oracle JET,20,9
+Backend/Services,Java,40,5
+Cloud/Infra,Oracle Cloud Infra,30,4
 ...
 ```
 
 Notes:
-- Only flat items (leaf nodes) are used; no nested/hierarchical CSV is expected here.
+- The treemap is two-level hierarchical: Area (parent) → Technology (leaf).
+- Parent node values are derived from the sum of children (no explicit value required).
 - `impact` must be numeric; non-numeric values are treated as 0.
+
+## Icons and Image Sources
+
+- All technology icons used in the treemap are open-source brand icons sourced from Simple Icons (https://simpleicons.org/).
+  - License: CC0 1.0 (Public Domain) — https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md
+- Local copies of the SVGs are committed under `src/css/images/tech/` and are referenced by the app:
+  - oracle.svg, java.svg, javascript.svg, html5.svg, figma.svg, terraform.svg, linux.svg, openjdk.svg, openai.svg
+- The mapping from technology name → icon filename is defined in `src/js/root.js` (`iconMap`). If a technology is not in the map, a default `oracle.svg` icon is used.
+- Additional SVG copies under `docs/images/` are the same open-source icons, used for documentation.
+- Trademark notice: Brand names and logos are trademarks of their respective owners. Usage here follows each brand’s guidelines.
+- Compliance note: We use only open-source icon assets (Simple Icons) and do not include copyrighted/non-open-source image assets.
+- Screenshot note: `docs/images/tech-stack-tree-map.png` is a screenshot produced by this app for documentation and contains no third‑party copyrighted content.
 
 ## Implementation Details
 
 - Markup (src/index.html):
-
   - Uses `<oj-treemap data="[[dataProvider]]">`.
-  - Custom leaf content via the Cookbook-recommended slot:
-    ```
-    <template slot="nodeContentTemplate" data-oj-as="node">
-      <div style="pointer-events: none;">
-        <span>[[node.data.label]]</span>
-        <span>[[node.data.value]]</span>
-      </div>
-    </template>
-    ```
-  - `pointer-events: none` preserves node interactivity since custom HTML overlays the node.
+  - nodeTemplate provides the base `<oj-treemap-node>` for all nodes:
+    - `label`, `value` (for leaves), `color`, `short-desc`.
+  - nodeContentTemplate overlays custom content for leaf nodes (icons and labels).
+    - The overlay is absolutely positioned and uses `pointer-events: none` to preserve interactions.
 
 - ViewModel (src/js/root.js):
-
-  - Loads CSV text via RequireJS: `text!../data/tech_2025.csv`
-  - Parses the CSV header/rows into an array of node objects:
+  - Loads CSV text via RequireJS: `text!../data/tech_2025.csv`.
+  - Parses the CSV into a two-level hierarchy grouped by `Area`:
     ```
-    { id, label, value, icon, badge, shortDesc }
+    [
+      {
+        id: 'area:<Area>',
+        label: <Area>,
+        color: <stable color per Area>,
+        shortDesc: 'Area: <Area>',
+        nodes: [
+          {
+            id: 'tech:<technology>',
+            label: <technology>,
+            value: <impact>,
+            area: <Area>,
+            icon: <icon filename>,
+            color: <Area color>,
+            shortDesc: '<technology> (<Area>) - Impact: <impact>'
+          },
+          ...
+        ]
+      },
+      ...
+    ]
     ```
-  - Creates an `ArrayTreeDataProvider(nodes, { keyAttributes: 'id' })`
-  - Applies KO bindings to `#app`
+  - Creates `ArrayTreeDataProvider(groups, { keyAttributes: 'id', childrenAttribute: 'nodes' })`.
+  - Applies KO bindings to `#app`.
 
 ## Run Locally
 
@@ -122,21 +149,26 @@ npx ojet build --release
 ## Update the Data
 
 - Edit `src/data/tech_2025.csv`
-- Keep the header row intact: `technology,impact,icon,badge`
+- Keep the header row intact: `Area,technology,impact,id`
 - Ensure `impact` is numeric
 - Save – the dev server should live-reload and update the treemap
-
-Alternatively, you can edit the source CSV in the project root (`tech_2025.csv`) and copy changes into `src/data/tech_2025.csv` if you prefer to keep a single source of truth.
+- Optional: If you add new technologies, either:
+  - Add a matching icon filename to `src/css/images/tech/` and update the `iconMap` in `root.js`, or
+  - Rely on the default `oracle.svg` icon
 
 ## Troubleshooting
 
 - No data appears:
-  - Verify that `<template slot="nodeContentTemplate">` (not `nodeTemplate`) is used in `index.html`
+  - Verify that both `nodeTemplate` and `nodeContentTemplate` exist in `index.html`
   - Check that `data="[[dataProvider]]"` is present on `<oj-treemap>`
-  - Open developer tools for any 404s loading `text!../data/tech_2025.csv`
+  - Open developer tools for any 404s when loading `text!../data/tech_2025.csv`
 - CSV changes don’t reflect:
   - Ensure you are editing `src/data/tech_2025.csv`
   - Confirm dev server logs “Page reloaded” when saving
+- Icons not visible:
+  - Confirm icon filenames in `src/css/images/tech/`
+  - Ensure the icon mapping in `root.js` includes the technology name
+  - Verify the CSS background image path: `css/images/tech/<icon>`
 - Node version issues:
   - Project indicates Node ≥ 16 in `package.json`. If using older versions, upgrade Node.
 - Dependency issues:
@@ -147,15 +179,21 @@ Alternatively, you can edit the source CSV in the project root (`tech_2025.csv`)
 
 - JET Treemap Cookbook (Node Content):
   - https://www.oracle.com/webfolder/technetwork/jet/jetCookbook.html?component=treemap&demo=nodeContent
+- Treemap Component:
+  - https://www.oracle.com/webfolder/technetwork/jet/jetCookbook.html?component=treemap&demo=default
+  - https://www.oracle.com/webfolder/technetwork/jet/jsdocs/oj.ojTreemap.html
+  - https://www.oracle.com/webfolder/technetwork/jet/jsdocs/oj.ojTreemapNode.html
 - Oracle JET 19 Docs: https://github.com/oracle/oraclejet
 - License: UPL 1.0 (see license headers in source files)
 
 ## Recent Changes Summary
 
-- Added `<oj-treemap>` with `nodeContentTemplate` in `src/index.html`
-- Implemented CSV parsing and data provider in `src/js/root.js`
-- Included `src/data/tech_2025.csv` and wired to RequireJS text loader
-- Verified with `npx ojet serve` (live reloading on file changes)
+- Added `Area` column to CSV and populated group values
+- Updated `parseCsv` to output two-level hierarchical structure grouped by Area
+- Switched to `ArrayTreeDataProvider(..., { keyAttributes: 'id', childrenAttribute: 'nodes' })`
+- Implemented `nodeContentTemplate` to overlay icons on leaf nodes
+- Added and wired icon assets under `src/css/images/tech/`
+- Updated documentation to reflect hierarchy and icon usage
 
 ## Cline Memory Bank
 
@@ -175,9 +213,3 @@ How to use with Cline:
 - At the start of a session/task, type: “follow your custom instructions”
 - To re-sync documentation as work progresses, type: “update memory bank”
 - Cline will read/write the files above to keep context accurate
-
-Notes:
-- The treemap currently uses a nodeTemplate with `<oj-treemap-node>` (see src/index.html)
-- Known technical items are tracked in memory-bank/progress.md (e.g., DataProvider keyAttributes, color indexing)
-- Keep the Memory Bank files updated after significant changes; they are the source of truth for continuity
-</content>

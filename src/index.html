@@ -51,6 +51,35 @@
             short-desc="[[node.data.shortDesc]]"
             label-style='{"fontSize":"25px","fontWeight":"900","whiteSpace":"wrap"}'></oj-treemap-node>
         </template>
+        <template slot="nodeContentTemplate">
+          <div
+            :style="[[{'position': 'absolute',
+                        'display':'flex',
+                        'flexDirection':'column',
+                        'alignItems':'center',
+                        'justifyContent':'center',
+                        'width': $current.bounds.width + 'px',
+                        'height': $current.bounds.height + 'px',
+                        'top': $current.bounds.y + 'px',
+                        'left': $current.bounds.x + 'px',
+                        'pointerEvents': 'none'}]]">
+            <oj-bind-if test="[[$current.data && $current.data.value != null]]">
+              <img
+                :src="[['resources/images/tech/' +  $current.itemData.icon ]]"
+                :alt="[['Icon for ' + ($current.itemData.label || 'technology')]]"
+                :style="[[{
+                  'objectFit': 'contain',
+                  'borderRadius': '12%',
+                  'width': '3.125rem',
+                  'height': '3.125rem'
+                }]]" />
+              <div class="oj-typography-body-sm oj-typography-bold oj-sm-margin-1x-top"
+                   :style="[[{'color':'#202124','textAlign':'center'}]]">
+                <oj-bind-text value="[[$current.itemData.label]]"></oj-bind-text>
+              </div>
+            </oj-bind-if>
+          </div>
+        </template>
       </oj-treemap>
     </div>
   </div>
