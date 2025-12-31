@@ -135,7 +135,7 @@ require(
             "Oracle ADB": "oracle.svg",
             "Oracle JET": "ojet.png",
             "Figma": "figma.svg",
-            "MCP": "openai.svg",
+            "MCP": "mcp.svg",
             "Oracle AI Agent Studio": "oracle.svg",
             "Terraform": "terraform.svg",
             "Oracle Linux": "linux.svg"
